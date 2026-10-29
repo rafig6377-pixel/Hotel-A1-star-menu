@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#b5121b">
+<title>A1 Star Chinese | Digital Menu</title>
+<style>
+:root{--red:#d71920;--deep:#130b0b;--panel:#211616;--gold:#ffc857;--cream:#fff7ed;--muted:#cbbaba}
+*{box-sizing:border-box} body{margin:0;background:var(--deep);color:var(--cream);font-family:Arial,Helvetica,sans-serif}
+header{padding:28px 18px 24px;text-align:center;background:radial-gradient(circle at top,#5a1014,#160909 68%);border-bottom:3px solid var(--red)}
+.logo{display:inline-grid;place-items:center;width:72px;height:72px;border:2px solid var(--gold);border-radius:50%;font-size:28px;font-weight:900;color:var(--gold);margin-bottom:8px}
+h1{margin:4px 0;font-size:clamp(28px,7vw,44px);letter-spacing:1px}.tag{color:var(--gold);margin:8px 0 0;font-size:14px;letter-spacing:2px}
+.wrap{max-width:980px;margin:auto;padding:18px}
+.notice{background:#321315;border:1px solid #743037;border-radius:12px;padding:12px 14px;font-size:13px;color:#ffe0d9;line-height:1.5;margin-bottom:18px}
+h2{font-size:21px;margin:22px 0 12px}.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.filter{border:1px solid #663035;background:#241515;color:var(--cream);border-radius:22px;padding:9px 13px;cursor:pointer}
+.filter.active{background:var(--red);border-color:var(--red);font-weight:bold}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.item{background:linear-gradient(145deg,#2b1a1a,#1a1010);border:1px solid #4d2929;border-radius:15px;padding:15px;display:flex;flex-direction:column;min-height:175px}
+.item .emoji{font-size:31px}.item h3{margin:8px 0 5px;font-size:17px}.desc{color:var(--muted);font-size:13px;line-height:1.4;flex:1}
+.bottom{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:13px}.price{color:var(--gold);font-size:18px;font-weight:800}
+button{font:inherit;cursor:pointer}.add,.primary{background:var(--red);color:white;border:0;border-radius:9px;padding:10px 13px;font-weight:bold}.add:hover,.primary:hover{background:#f02b32}
+.cart{margin-top:24px;background:var(--panel);border:1px solid #593030;border-radius:16px;padding:16px}
+.cartrow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #493030}
+.qty{display:flex;align-items:center;gap:9px}.qty button{width:28px;height:28px;border-radius:7px;background:#3b2424;border:1px solid #714040;color:white}
+.total{display:flex;justify-content:space-between;font-size:20px;font-weight:bold;margin:15px 0;color:var(--gold)}
+.primary{width:100%;padding:14px;font-size:16px}.small{font-size:12px;color:var(--muted);line-height:1.5}
+.qrbox{text-align:center;margin:24px auto 10px;padding:16px;background:#fff;color:#111;border-radius:14px;max-width:330px}
+.qrbox img{width:190px;height:190px;max-width:100%;display:block;margin:12px auto}
+.qrbox button{background:#171010;color:white;border:0;border-radius:8px;padding:10px 14px}
+footer{text-align:center;padding:24px;color:#bbaaaa;font-size:12px}
+@media print{body{background:#fff;color:#111}.wrap> :not(.qrbox){display:none!important}.qrbox{display:block!important;max-width:100%;border:1px solid #ddd}.qrbox button{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">A1</div>
+  <h1>A1 STAR CHINESE</h1>
+  <p class="tag">HOT • FRESH • DELICIOUS</p>
+</header>
+<main class="wrap">
+  <div class="notice"><strong>Setup reminder:</strong> Before publishing, replace the sample WhatsApp number and sample prices/items in <code>index.html</code> with your shop's real details.</div>
+  <h2>🍜 Explore Our Menu</h2>
+  <div class="filters" id="filters"></div>
+  <section class="grid" id="menu" aria-live="polite"></section>
+  <section class="cart">
+    <h2 style="margin-top:0">🛒 Your Order</h2>
+    <div id="cart"><p class="small">Your selected items will appear here.</p></div>
+    <div class="total"><span>Total</span><span id="total">₹0</span></div>
+    <button class="primary" onclick="sendOrder()">Order on WhatsApp</button>
+    <p class="small">WhatsApp opens with your order message. Check the order and tap Send to place it. This website does not send messages automatically.</p>
+  </section>
+  <section class="qrbox">
+    <strong>SCAN TO OPEN OUR MENU</strong>
+    <p style="font-size:13px;margin:7px 0">A1 Star Chinese • Digital Menu</p>
+    <img id="qr" alt="QR code for this digital menu" src="" />
+    <p id="qrhint" style="font-size:12px">Publish this website first, then this QR code will point to its live address.</p>
+    <button onclick="window.print()">Print QR Stand</button>
+  </section>
+</main>
+<footer>A1 Star Chinese · Thank you for ordering with us!</footer>
+<script>
+// IMPORTANT: Replace this with your shop's WhatsApp number in international format.
+// India example format: 91 followed by the 10-digit mobile number. No +, spaces or dashes.
+const WHATSAPP_NUMBER = "919XXXXXXXXX";
+
+// SAMPLE MENU: edit names, categories, descriptions and prices to match your real menu.
+const items = [
+ {id:1,name:"Veg Hakka Noodles",cat:"Noodles",price:100,emoji:"🍜",desc:"Wok-tossed noodles with fresh vegetables"},
+ {id:2,name:"Schezwan Noodles",cat:"Noodles",price:120,emoji:"🌶️",desc:"Spicy Schezwan-style noodles"},
+ {id:3,name:"Veg Fried Rice",cat:"Rice",price:100,emoji:"🍚",desc:"Fried rice with vegetables"},
+ {id:4,name:"Schezwan Fried Rice",cat:"Rice",price:120,emoji:"🥡",desc:"Spicy, flavour-packed fried rice"},
+ {id:5,name:"Veg Manchurian",cat:"Starters",price:120,emoji:"🥢",desc:"Crispy vegetable balls in Manchurian sauce"},
+ {id:6,name:"Paneer Chilli",cat:"Starters",price:160,emoji:"🍽️",desc:"Paneer tossed with peppers and sauce"},
+ {id:7,name:"Chicken Hakka Noodles",cat:"Chicken",price:150,emoji:"🍜",desc:"Noodles with chicken and vegetables"},
+ {id:8,name:"Chicken Fried Rice",cat:"Chicken",price:160,emoji:"🍗",desc:"Wok-fried rice with chicken"}
+];
+let cart = {};
+let active = "All";
+const cats = ["All",...new Set(items.map(i=>i.cat))];
+const filters = document.getElementById("filters");
+cats.forEach(c=>{const b=document.createElement("button");b.className="filter"+(c==="All"?" active":"");b.textContent=c;b.onclick=()=>{active=c;document.querySelectorAll(".filter").forEach(x=>x.classList.toggle("active",x.textContent===c));renderMenu()};filters.appendChild(b)});
+function money(n){return "₹"+n.toLocaleString("en-IN")}
+function renderMenu(){
+ const menu=document.getElementById("menu");menu.innerHTML="";
+ items.filter(i=>active==="All"||i.cat===active).forEach(i=>{
+  const el=document.createElement("article");el.className="item";
+  el.innerHTML=`<div class="emoji">${i.emoji}</div><h3>${i.name}</h3><div class="desc">${i.desc}</div><div class="bottom"><span class="price">${money(i.price)}</span><button class="add" onclick="changeQty(${i.id},1)">+ Add</button></div>`;
+  menu.appendChild(el)
+ });
+}
+function changeQty(id,delta){cart[id]=(cart[id]||0)+delta;if(cart[id]<=0)delete cart[id];renderCart()}
+function renderCart(){
+ const el=document.getElementById("cart");const chosen=items.filter(i=>cart[i.id]);
+ if(!chosen.length){el.innerHTML='<p class="small">Your selected items will appear here.</p>'}
+ else{el.innerHTML=chosen.map(i=>`<div class="cartrow"><div><strong>${i.name}</strong><div class="small">${money(i.price)} each</div></div><div class="qty"><button onclick="changeQty(${i.id},-1)" aria-label="Remove one">−</button><strong>${cart[i.id]}</strong><button onclick="changeQty(${i.id},1)" aria-label="Add one">+</button></div><strong>${money(i.price*cart[i.id])}</strong></div>`).join("")}
+ const total=items.reduce((s,i)=>s+i.price*(cart[i.id]||0),0);document.getElementById("total").textContent=money(total)
+}
+function sendOrder(){
+ const chosen=items.filter(i=>cart[i.id]);
+ if(!chosen.length){alert("Please add at least one item first.");return}
+ if(WHATSAPP_NUMBER.includes("X")){alert("Shop setup needed: replace WHATSAPP_NUMBER in index.html with your real WhatsApp number, then publish again.");return}
+ const lines=chosen.map(i=>`${i.name} x ${cart[i.id]} = ${money(i.price*cart[i.id])}`);
+ const total=items.reduce((s,i)=>s+i.price*(cart[i.id]||0),0);
+ const msg=`Hello A1 Star Chinese! I would like to order:\n\n${lines.join("\n")}\n\nTotal: ${money(total)}\nName: \nPickup/Delivery: \nAddress (if delivery): `;
+ window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`,"_blank");
+}
+(function makeQR(){
+ const url=window.location.href;
+ const img=document.getElementById("qr");
+ if(url.startsWith("http://")||url.startsWith("https://")){
+   img.src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data="+encodeURIComponent(url);
+   document.getElementById("qrhint").textContent="Scan this code to open the live menu. Test it before printing.";
+ }else{
+   img.style.display="none";
+ }
+})();
+renderMenu();renderCart();
+</script>
+</body>
+</html>
